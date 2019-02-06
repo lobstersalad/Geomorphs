@@ -1,5 +1,4 @@
 # Geomorphs
 
 Todo - 
-Generate dungeon
-Chop dungeon png into tiles
+Generate dungeon, chop dungeon png into tiles
