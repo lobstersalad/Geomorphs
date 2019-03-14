@@ -11,11 +11,11 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv, "i:o:d:", ["input=", "output=", "dimensions="])
     except getopt.GetoptError:
-        print("test.py -i <inputfile> -o <outputfile> -d <dimensions>")
+        print("chop.py -i <inputfile> -o <outputfile> -d <dimensions>")
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print("test.py -i <inputfile> -o <outputfile> -d <dimensions>")
+            print("chop.py -i <inputfile> -o <outputfile> -d <dimensions>")
             sys.exit()
         elif opt in ("-i", "--input"):
             input = arg
