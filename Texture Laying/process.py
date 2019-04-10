@@ -13,12 +13,19 @@ Procedure
 5. Paste in special tiles
 '''
 
+'''
+ToDo
+ - Try texturing floor using template matching for floor tiles
+ - Resize original image to very large before any processing happens
+    - Need to resize template images and retune dilation for this
+'''
+
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 from PIL import Image
 
-# Find array of x, y coordinates for given special tile
+# Find array of x, y coordinates for given special tile type
 def match(template, image):
     w, h = template.shape[::-1]
     res = cv2.matchTemplate(image, template, cv2.TM_CCOEFF_NORMED)
@@ -57,7 +64,7 @@ doorh_template = cv2.imread('doorh_template.png', 0)
 doorv_template = cv2.imread('doorv_template.png', 0)
 door_texture = cv2.imread('door.jpg', -1)
 wall_texture = cv2.imread('grass.jpg', -1)
-floor_texture = cv2.imread('wallpaper.png', -1)
+floor_texture = cv2.imread('tiles.png', -1)
 
 #  Dilate and draw contours
 # ------------------------------------------------------------------------------
@@ -73,14 +80,14 @@ cv2.drawContours(dilated, contours, -1, (0, 255, 0), 10)
 # ------------------------------------------------------------------------------
 textured_walls = Image.fromarray(dilated)
 textured_walls = textured_walls.convert("RGBA")
-pixdata = textured_walls.load()
+data = textured_walls.load()
 
 # Convert all pixels within contour lines to transparent
 width, height = textured_walls.size
 for y in range(height):
     for x in range(width):
-        if pixdata[x, y] != (0, 0, 0, 255) and pixdata[x, y] != (255, 255, 255, 255):
-            pixdata[x, y] = (0, 255, 0, 0)
+        if data[x, y] != (0, 0, 0, 255) and data[x, y] != (255, 255, 255, 255):
+            data[x, y] = (0, 255, 0, 0)
 
 wall_texture = cv2.resize(wall_texture, (int(1751), int(2251)))
 textured_walls = cv2.cvtColor(np.array(textured_walls), cv2.COLOR_RGBA2BGRA)
@@ -100,14 +107,14 @@ textured_walls = np.uint8(cv2.addWeighted(wall_texture_part, 255.0, textured_wal
 textured_walls = cv2.cvtColor(textured_walls, cv2.COLOR_BGRA2RGBA)
 textured_combination = Image.fromarray(textured_walls)
 textured_combination = textured_combination.convert("RGBA")
-pixdata = textured_combination.load()
+data = textured_combination.load()
 
 # Convert all non-transparent white pixels to transparent
 width, height = textured_combination.size
 for y in range(height):
     for x in range(width):
-        if pixdata[x, y] == (255, 255, 255, 255):
-            pixdata[x, y] = (255, 255, 255, 0)
+        if data[x, y] == (255, 255, 255, 255):
+            data[x, y] = (255, 255, 255, 0)
 
 floor_texture = cv2.resize(floor_texture, (int(1751), int(2251)))
 textured_combination = cv2.cvtColor(np.array(textured_combination), cv2.COLOR_RGBA2BGRA)
