@@ -17,7 +17,8 @@ Procedure
 ToDo
  - Try texturing floor using template matching for floor tiles
  - Resize original image to very large before any processing happens
-    - Need to resize template images and retune dilation for this
+    - Need to resize template images and retune dilation for this to work
+
 '''
 
 import cv2
