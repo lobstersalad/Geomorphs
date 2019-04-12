@@ -1,11 +1,18 @@
 import random
+import os
+import tempfile
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-driver = webdriver.Firefox()
+options = webdriver.ChromeOptions()
+options.add_argument("headless")
+driver = webdriver.Chrome(chrome_options = options)
+driver.command_executor._commands["send_command"] = ("POST", '/session/$sessionId/chromium/send_command')
+params = {'cmd': 'Page.setDownloadBehavior', 'params': {'behavior': 'allow', 'downloadPath': '/home/lobstersalad/Documents/490/Geomorphs/GUI'}}
+driver.execute("send_command", params)
 driver.get("https://donjon.bin.sh/d20/dungeon/")
 
 def text_select(option, value):
