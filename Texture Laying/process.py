@@ -18,7 +18,7 @@ ToDo
  - Try texturing floor using template matching for floor tiles
  - Resize original image to very large before any processing happens
     - Need to resize template images and retune dilation for this to work
-
+    - Might produce better quality map
 '''
 
 import cv2
@@ -59,13 +59,13 @@ def paste(x, y):
 
 # Load required images into variables
 # ------------------------------------------------------------------------------
-original = cv2.imread('test_dungeon2.png')
+original = cv2.imread('test_dungeon5.png')
 original_bw = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)
 doorh_template = cv2.imread('doorh_template.png', 0)
 doorv_template = cv2.imread('doorv_template.png', 0)
 door_texture = cv2.imread('door.jpg', -1)
-wall_texture = cv2.imread('grass.jpg', -1)
-floor_texture = cv2.imread('tiles.png', -1)
+wall_texture = cv2.imread('tiles.png', -1)
+floor_texture = cv2.imread('grass.jpg', -1)
 
 #  Dilate and draw contours
 # ------------------------------------------------------------------------------
@@ -90,7 +90,7 @@ for y in range(height):
         if data[x, y] != (0, 0, 0, 255) and data[x, y] != (255, 255, 255, 255):
             data[x, y] = (0, 255, 0, 0)
 
-wall_texture = cv2.resize(wall_texture, (int(2851), int(2851)))
+wall_texture = cv2.resize(wall_texture, (int(original.shape[1]), int(original.shape[0])))
 textured_walls = cv2.cvtColor(np.array(textured_walls), cv2.COLOR_RGBA2BGRA)
 
 # Separate RGB and Alpha channels, apply texture to Alpha portion, recombine
@@ -117,7 +117,7 @@ for y in range(height):
         if data[x, y] == (255, 255, 255, 255):
             data[x, y] = (255, 255, 255, 0)
 
-floor_texture = cv2.resize(floor_texture, (int(2851), int(2851)))
+floor_texture = cv2.resize(floor_texture, (int(original.shape[1]), int(original.shape[0])))
 textured_combination = cv2.cvtColor(np.array(textured_combination), cv2.COLOR_RGBA2BGRA)
 
 # Separate RGB and Alpha channels, apply texture to Alpha portion, recombine
