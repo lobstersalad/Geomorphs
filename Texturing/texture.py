@@ -15,9 +15,17 @@ Procedure
 
 '''
 ToDo
+ - Count number of files in tile directories for RNG
+ - Rotate tile images for more randomized appearance
+ -
  - Resize original image to very large before any processing happens
     - Need to resize template images and retune dilation for this to work
     - Might produce better quality map for tiled floors
+'''
+
+'''
+Bugs
+ - Some dungeon layouts give a difference of array size / channel error, have been unable to reproduce
 '''
 import random
 import cv2
@@ -58,7 +66,7 @@ def paste(x, y):
 
 # Load required images into variables
 # ------------------------------------------------------------------------------
-original = cv2.imread('test_dungeon.png')
+original = cv2.imread('test_dungeon2.png', -1)
 original_bw = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)
 doorh_template = cv2.imread('../Templates/doorh_template.png', 0)
 doorv_template = cv2.imread('../Templates/doorv_template.png', 0)
