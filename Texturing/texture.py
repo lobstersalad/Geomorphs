@@ -16,8 +16,6 @@ Procedure
 '''
 ToDo
  - Count number of files in tile directories for RNG
- - Rotate tile images for more randomized appearance
- -
  - Resize original image to very large before any processing happens
     - Need to resize template images and retune dilation for this to work
     - Might produce better quality map for tiled floors
@@ -66,7 +64,7 @@ def paste(x, y):
 
 # Load required images into variables
 # ------------------------------------------------------------------------------
-original = cv2.imread('test_dungeon2.png', -1)
+original = cv2.imread('test_dungeon4.png', -1)
 original_bw = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)
 doorh_template = cv2.imread('../Templates/doorh_template.png', 0)
 doorv_template = cv2.imread('../Templates/doorv_template.png', 0)
@@ -78,6 +76,7 @@ tiled_floors = True
 
 #  Dilate and draw contours
 # ------------------------------------------------------------------------------
+print ("Dilating Map...")
 kernel = np.ones((5, 5), np.uint8)
 dilated = cv2.dilate(original, kernel, iterations = 2)
 dilated = cv2.cvtColor(dilated, cv2.COLOR_BGR2GRAY)
@@ -88,6 +87,7 @@ cv2.drawContours(dilated, contours, -1, (0, 255, 0), 10)
 
 # Texture walls
 # ------------------------------------------------------------------------------
+print ("Texturing Walls...")
 textured_walls = Image.fromarray(dilated)
 textured_walls = textured_walls.convert("RGBA")
 data = textured_walls.load()
@@ -114,6 +114,7 @@ textured_walls = np.uint8(cv2.addWeighted(wall_texture_part, 255.0, textured_wal
 
 # Texture floor
 # ------------------------------------------------------------------------------
+print ("Texturing Floor...")
 if tiled_floors == False:
     textured_walls = cv2.cvtColor(textured_walls, cv2.COLOR_BGRA2RGBA)
     textured_combination = Image.fromarray(textured_walls)
@@ -143,15 +144,20 @@ else:
     tile_template = cv2.imread('../Templates/tile_template.png', 0)
     textured_combination = textured_walls
     background = textured_walls
+    rotation = [cv2.ROTATE_90_CLOCKWISE, cv2.ROTATE_180, cv2.ROTATE_90_COUNTERCLOCKWISE]
 
     loc = match(tile_template, original_bw)
     for pt in zip(*loc[::-1]):
         foreground = cv2.imread('../Textures/White_Tiles/tile' + str(random.randint(1, 34)) + '.png', -1)
+        degrees = random.randint(0, 3)
+        if (degrees != 3):
+            foreground = cv2.rotate(foreground, rotation[degrees])
         foreground = cv2.resize(foreground, (int(51), int(51)))
         paste(pt[0], pt[1])
 
 # Texture special tiles
 # ------------------------------------------------------------------------------
+print ("Texturing Special Tiles...")
 foreground, background = door_texture, textured_combination
 foreground = cv2.resize(foreground, (int(51), int(51)))
 
@@ -165,3 +171,4 @@ for pt in zip(*loc[::-1]):
 
 # Final image
 cv2.imwrite('textured_dungeon.png', background)
+print ("Finished!")
