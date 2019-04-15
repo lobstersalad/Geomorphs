@@ -38,15 +38,17 @@ def button_press(option, wait):
     element = WebDriverWait(driver, wait).until(EC.presence_of_element_located((By.XPATH, option)), message = "Unable to Locate Button")
     element.click()
 
+# Don't really care about level, motif
+# Need defaults for style, grid
 print ("Selecting Map Options...")
 text_select("name", "Testing")
 dd_select("level", "2")
 dd_select("motif", "None")
-text_select("seed", "2000")
+text_select("seed", "9999")
 dd_select("map_style", "Standard")
 dd_select("grid", "Square")
 dd_select("dungeon_layout", "Keep")
-dd_select("dungeon_size", "Huge")
+dd_select("dungeon_size", "Fine")
 dd_select("peripheral_egress", "Tiling")
 dd_select("add_stairs", "No")
 dd_select("room_layout", "Symmetric")

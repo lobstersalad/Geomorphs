@@ -9,13 +9,13 @@ Procedure
 1. Template matching for special tiles, save locations
 2. Dilate
 3. Draw contours
-4. Transparency layering for floor and walls
+4. Transparency layering for floor (optional) and walls
 5. Paste in special tiles
 '''
 
 '''
 ToDo
- - Count number of files in tile directories for RNG
+ - Count number of files in tile directories for RNG tiling
  - Resize original image to very large before any processing happens
     - Need to resize template images and retune dilation for this to work
     - Might produce better quality map for tiled floors
@@ -64,7 +64,7 @@ def paste(x, y):
 
 # Load required images into variables
 # ------------------------------------------------------------------------------
-original = cv2.imread('test_dungeon4.png', -1)
+original = cv2.imread('test_dungeon5.png', -1)
 original_bw = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)
 doorh_template = cv2.imread('../Templates/doorh_template.png', 0)
 doorv_template = cv2.imread('../Templates/doorv_template.png', 0)
@@ -76,7 +76,7 @@ tiled_floors = True
 
 #  Dilate and draw contours
 # ------------------------------------------------------------------------------
-print ("Dilating Map...")
+print ("Drawing Walls...")
 kernel = np.ones((5, 5), np.uint8)
 dilated = cv2.dilate(original, kernel, iterations = 2)
 dilated = cv2.cvtColor(dilated, cv2.COLOR_BGR2GRAY)
