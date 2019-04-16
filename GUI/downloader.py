@@ -13,8 +13,8 @@ from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-def download(dungeon_layout, dungeon_size, peripheral_egress, add_stairs,
-             room_layout, room_size, door_set, corridor_layout, remove_deadends):
+def download(dungeon_name, random_seed, dungeon_layout, dungeon_size, peripheral_egress, add_stairs, room_layout, room_size, door_set,
+             corridor_layout, remove_deadends):
     def text_select(option, value):
         element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.NAME, option)), message = "Unable to Locate Text Box")
         element.clear()
@@ -42,10 +42,10 @@ def download(dungeon_layout, dungeon_size, peripheral_egress, add_stairs,
     # Don't really care about level, motif
     # Need defaults for style, grid
     print ("Selecting Map Options...")
-    text_select("name", "Testing")
+    text_select("name", dungeon_name)
     dd_select("level", "1")
     dd_select("motif", "None")
-    text_select("seed", "34034853")
+    text_select("seed", random_seed)
     dd_select("map_style", "Standard")
     dd_select("grid", "Square")
     dd_select("dungeon_layout", dungeon_layout)
