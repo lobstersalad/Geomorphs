@@ -2,6 +2,16 @@
 #          https://riverbankcomputing.com/static/Docs/PyQt5
 #          https://pythonprogramminglanguage.com/pyqt5-button/
 
+'''
+ToDo
+ - File dialogs for download path and texture target
+ - Tiling / transparency floor options
+ - Floor tileset / single image options with image previews
+ - Progress bars
+ - Test downloader on eduroam
+
+'''
+
 import sys
 sys.path.append('../Texturing/')
 
@@ -99,7 +109,7 @@ class MainWindow(QMainWindow):
         construct.clicked.connect(self.download_button)
         grid.addWidget(construct, 11, 0)
 
-        download_path = QFileDialog.getSaveFileName(self, "Download File", "", ("PNG Image (*.png)"))
+        #download_path = QFileDialog.getSaveFileName(self, "Download File", "", ("PNG Image (*.png)"))
         #grid.addWidget(download_path, 11, 1)
 
         construct = QPushButton("Texture")

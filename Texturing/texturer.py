@@ -15,14 +15,17 @@ Procedure
 '''
 ToDo
  - Count number of files in tile directories for RNG tiling
+ - Add images for all door types and numbered tiles
  - Resize original image to very large before any processing happens
     - Need to resize template images and retune dilation for this to work
     - Might produce better quality map for tiled floors
+ - Template matching for wall segments
 '''
 
 '''
 Bugs
- - Some dungeon layouts give a difference of array size / channel error, have been unable to reproduce
+ - ? Fixed - Some dungeon layouts with doors give a difference of array size / channel error, has been hard to reproduce
+             but has something to do with special tile locations
 '''
 import random
 import cv2
@@ -35,7 +38,7 @@ def texture():
     def match(template, image):
         w, h = template.shape[::-1]
         res = cv2.matchTemplate(image, template, cv2.TM_CCOEFF_NORMED)
-        threshold = 0.8
+        threshold = 0.99
         loc = np.where( res >= threshold)
         return loc
 
@@ -64,7 +67,7 @@ def texture():
 
     # Load required images into variables
     # ------------------------------------------------------------------------------
-    original = cv2.imread('../Texturing/test_dungeon1.png', -1)
+    original = cv2.imread('../Texturing/test_dungeon.png', -1)
     original_bw = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)
     doorh_template = cv2.imread('../Templates/doorh_template.png', 0)
     doorv_template = cv2.imread('../Templates/doorv_template.png', 0)
@@ -72,7 +75,7 @@ def texture():
     wall_texture = cv2.imread('../Textures/Testing/tiles.png', -1)
     floor_texture = cv2.imread('../Textures/Testing/grass.png', -1)
 
-    tiled_floors = True
+    tiled_floors = False
 
     #  Dilate and draw contours
     # ------------------------------------------------------------------------------
@@ -148,7 +151,7 @@ def texture():
 
         loc = match(tile_template, original_bw)
         for pt in zip(*loc[::-1]):
-            foreground = cv2.imread('../Textures/White_Tiles/tile' + str(random.randint(1, 34)) + '.png', -1)
+            foreground = cv2.imread('../Textures/Brown_Tiles/tile' + str(random.randint(1, 34)) + '.png', -1)
             degrees = random.randint(0, 3)
             if (degrees != 3):
                 foreground = cv2.rotate(foreground, rotation[degrees])
@@ -159,6 +162,7 @@ def texture():
     # ------------------------------------------------------------------------------
     print ("Texturing Special Tiles...")
     foreground, background = door_texture, textured_combination
+    foreground = cv2.cvtColor(foreground, cv2.COLOR_BGRA2BGR)
     foreground = cv2.resize(foreground, (int(51), int(51)))
 
     loc = match(doorh_template, original_bw)
