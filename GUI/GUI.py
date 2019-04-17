@@ -4,12 +4,10 @@
 
 '''
 ToDo
- - File dialogs for download path and texture target
  - Tiling / transparency floor options
  - Floor tileset / single image options with image previews
  - Progress bars
  - Test downloader on eduroam
-
 '''
 
 import sys
@@ -18,6 +16,7 @@ sys.path.append('../Texturing/')
 from downloader import download
 from texturer import texture
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QWidget, QMainWindow, QApplication, QLabel, QFileDialog
 from PyQt5.QtWidgets import QGridLayout, QComboBox, QPushButton, QLineEdit
 
@@ -41,7 +40,7 @@ class MainWindow(QMainWindow):
 
         dungeon_layout_label = QLabel("Dungeon Layout")
         self.dungeon_layout_dd = QtWidgets.QComboBox()
-        options = ["Layout", "Square", "Rectangle", "Box", "Cross", "Dagger",
+        options = ["Square", "Rectangle", "Box", "Cross", "Dagger",
                    "Saltire", "Keep", "Hexagon", "Round", "Cavernous"]
         self.dungeon_layout_dd.addItems(options)
         grid.addWidget(dungeon_layout_label, 2, 0)
@@ -105,22 +104,37 @@ class MainWindow(QMainWindow):
         grid.addWidget(remove_deadends_label, 10, 0)
         grid.addWidget(self.remove_deadends_dd, 10, 1)
 
-        construct = QPushButton("Download")
-        construct.clicked.connect(self.download_button)
-        grid.addWidget(construct, 11, 0)
+        download_label = QLabel("Download Path")
+        self.download_path = QLineEdit()
+        download_browse_button = QPushButton("Browse")
+        download_browse_button.clicked.connect(self.set_download_path)
+        download_button = QPushButton("Download")
+        download_button.clicked.connect(self.download_button_action)
+        grid.addWidget(download_label, 11, 0)
+        grid.addWidget(self.download_path, 11, 1)
+        grid.addWidget(download_browse_button, 11, 2)
+        grid.addWidget(download_button, 11, 3)
 
-        #download_path = QFileDialog.getSaveFileName(self, "Download File", "", ("PNG Image (*.png)"))
-        #grid.addWidget(download_path, 11, 1)
-
-        construct = QPushButton("Texture")
-        construct.clicked.connect(texture)
-        grid.addWidget(construct, 12, 0)
+        texture_label = QLabel("Texture Path")
+        self.texture_path = QLineEdit()
+        texture_browse_button = QPushButton("Browse")
+        texture_browse_button.clicked.connect(self.set_texture_path)
+        texture_button = QPushButton("Texture")
+        texture_button.clicked.connect(self.texture_button_action)
+        grid.addWidget(texture_label, 12, 0)
+        grid.addWidget(self.texture_path, 12, 1)
+        grid.addWidget(texture_browse_button, 12, 2)
+        grid.addWidget(texture_button, 12, 3)
 
     def set_download_path(self):
-        print("Nothing")
+        options = QFileDialog.DontUseNativeDialog
+        options |= QFileDialog.ShowDirsOnly
+        path = QFileDialog.getExistingDirectory(self, "Download Path", "", options = options)
+        self.download_path.setText(path)
 
-    def download_button(self):
-        download(self.dungeon_name_box.text(),
+    def download_button_action(self):
+        download(self.download_path.text(),
+                 self.dungeon_name_box.text(),
                  self.random_seed_box.text(),
                  self.dungeon_layout_dd.currentText(),
                  self.dungeon_size_dd.currentText(),
@@ -131,6 +145,14 @@ class MainWindow(QMainWindow):
                  self.door_set_dd.currentText(),
                  self.corridor_layout_dd.currentText(),
                  self.remove_deadends_dd.currentText())
+
+    def set_texture_path(self):
+        options = QFileDialog.DontUseNativeDialog
+        path, filter = QFileDialog.getOpenFileName(self, "Texture Path", "", "PNG (*.PNG *.png);; JPEG (*.JPEG *.jpeg *.JPG *.jpg)", options = options)
+        self.texture_path.setText(path)
+
+    def texture_button_action(self):
+        texture(self.texture_path.text(), True)
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

@@ -33,12 +33,12 @@ import numpy as np
 from matplotlib import pyplot as plt
 from PIL import Image
 
-def texture():
+def texture(texture_path, tiling):
     # Find array of x, y coordinates for given special tile type
     def match(template, image):
         w, h = template.shape[::-1]
         res = cv2.matchTemplate(image, template, cv2.TM_CCOEFF_NORMED)
-        threshold = 0.99
+        threshold = 0.90
         loc = np.where( res >= threshold)
         return loc
 
@@ -67,15 +67,13 @@ def texture():
 
     # Load required images into variables
     # ------------------------------------------------------------------------------
-    original = cv2.imread('../Texturing/test_dungeon.png', -1)
+    original = cv2.imread(texture_path, -1)
     original_bw = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)
     doorh_template = cv2.imread('../Templates/doorh_template.png', 0)
     doorv_template = cv2.imread('../Templates/doorv_template.png', 0)
     door_texture = cv2.imread('../Textures/Doors/door1.png', -1)
     wall_texture = cv2.imread('../Textures/Testing/tiles.png', -1)
     floor_texture = cv2.imread('../Textures/Testing/grass.png', -1)
-
-    tiled_floors = False
 
     #  Dilate and draw contours
     # ------------------------------------------------------------------------------
@@ -118,7 +116,7 @@ def texture():
     # Texture floor
     # ------------------------------------------------------------------------------
     print ("Texturing Floor...")
-    if tiled_floors == False:
+    if tiling == False:
         textured_walls = cv2.cvtColor(textured_walls, cv2.COLOR_BGRA2RGBA)
         textured_combination = Image.fromarray(textured_walls)
         textured_combination = textured_combination.convert("RGBA")
@@ -151,7 +149,7 @@ def texture():
 
         loc = match(tile_template, original_bw)
         for pt in zip(*loc[::-1]):
-            foreground = cv2.imread('../Textures/Brown_Tiles/tile' + str(random.randint(1, 34)) + '.png', -1)
+            foreground = cv2.imread('../Textures/White_Tiles/tile' + str(random.randint(1, 34)) + '.png', -1)
             degrees = random.randint(0, 3)
             if (degrees != 3):
                 foreground = cv2.rotate(foreground, rotation[degrees])

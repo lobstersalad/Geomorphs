@@ -13,7 +13,7 @@ from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-def download(dungeon_name, random_seed, dungeon_layout, dungeon_size, peripheral_egress, add_stairs, room_layout, room_size, door_set,
+def download(download_path, dungeon_name, random_seed, dungeon_layout, dungeon_size, peripheral_egress, add_stairs, room_layout, room_size, door_set,
              corridor_layout, remove_deadends):
     def text_select(option, value):
         element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.NAME, option)), message = "Unable to Locate Text Box")
@@ -33,7 +33,7 @@ def download(dungeon_name, random_seed, dungeon_layout, dungeon_size, peripheral
     options.add_argument("headless")
     driver = webdriver.Chrome(chrome_options = options)
     driver.command_executor._commands["send_command"] = ("POST", '/session/$sessionId/chromium/send_command')
-    params = {'cmd': 'Page.setDownloadBehavior', 'params': {'behavior': 'allow', 'downloadPath': '/home/lobstersalad/Documents/490/Geomorphs/Texturing'}}
+    params = {'cmd': 'Page.setDownloadBehavior', 'params': {'behavior': 'allow', 'downloadPath': download_path}}
     driver.execute("send_command", params)
     print ("Connecting to donjon...")
     driver.get("https://donjon.bin.sh/d20/dungeon/")
