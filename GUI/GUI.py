@@ -104,16 +104,23 @@ class MainWindow(QMainWindow):
         grid.addWidget(remove_deadends_label, 10, 0)
         grid.addWidget(self.remove_deadends_dd, 10, 1)
 
+        tiled_floors_label = QLabel("Tiled Floors")
+        self.tiled_floors_dd = QtWidgets.QComboBox()
+        options = ["Yes", "No"]
+        self.tiled_floors_dd.addItems(options)
+        grid.addWidget(tiled_floors_label, 11, 0)
+        grid.addWidget(self.tiled_floors_dd,  11, 1)
+
         download_label = QLabel("Download Path")
         self.download_path = QLineEdit()
         download_browse_button = QPushButton("Browse")
         download_browse_button.clicked.connect(self.set_download_path)
         download_button = QPushButton("Download")
         download_button.clicked.connect(self.download_button_action)
-        grid.addWidget(download_label, 11, 0)
-        grid.addWidget(self.download_path, 11, 1)
-        grid.addWidget(download_browse_button, 11, 2)
-        grid.addWidget(download_button, 11, 3)
+        grid.addWidget(download_label, 12, 0)
+        grid.addWidget(self.download_path, 12, 1)
+        grid.addWidget(download_browse_button, 12, 2)
+        grid.addWidget(download_button, 12, 3)
 
         texture_label = QLabel("Texture Path")
         self.texture_path = QLineEdit()
@@ -121,10 +128,10 @@ class MainWindow(QMainWindow):
         texture_browse_button.clicked.connect(self.set_texture_path)
         texture_button = QPushButton("Texture")
         texture_button.clicked.connect(self.texture_button_action)
-        grid.addWidget(texture_label, 12, 0)
-        grid.addWidget(self.texture_path, 12, 1)
-        grid.addWidget(texture_browse_button, 12, 2)
-        grid.addWidget(texture_button, 12, 3)
+        grid.addWidget(texture_label, 13, 0)
+        grid.addWidget(self.texture_path, 13, 1)
+        grid.addWidget(texture_browse_button, 13, 2)
+        grid.addWidget(texture_button, 13, 3)
 
     def set_download_path(self):
         options = QFileDialog.DontUseNativeDialog
@@ -152,7 +159,10 @@ class MainWindow(QMainWindow):
         self.texture_path.setText(path)
 
     def texture_button_action(self):
-        texture(self.texture_path.text(), True)
+        if self.tiled_floors_dd.currentText() == "Yes":
+            texture(self.texture_path.text(), True)
+        else:
+            texture(self.texture_path.text(), False)
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

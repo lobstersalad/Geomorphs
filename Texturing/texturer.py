@@ -38,7 +38,7 @@ def texture(texture_path, tiling):
     def match(template, image):
         w, h = template.shape[::-1]
         res = cv2.matchTemplate(image, template, cv2.TM_CCOEFF_NORMED)
-        threshold = 0.90
+        threshold = 0.95
         loc = np.where( res >= threshold)
         return loc
 
@@ -142,19 +142,28 @@ def texture(texture_path, tiling):
         textured_combination_part = (textured_combination_img * (1 / 255.0)) * (textured_combination_mask * (1 / 255.0))
         textured_combination = np.uint8(cv2.addWeighted(floor_texture_part, 255.0, textured_combination_part, 255.0, 0.0))
     else:
-        tile_template = cv2.imread('../Templates/tile_template.png', 0)
+        floor_tile_templates = ["tile_template_plain.png", "tile_template_0.png", "tile_template_1.png", "tile_template_2.png",
+                                "tile_template_3.png", "tile_template_4.png", "tile_template_5.png", "tile_template_6.png",
+                                "tile_template_7.png", "tile_template_8.png", "tile_template_9.png", "tile_template_a.png",
+                                "tile_template_c.png", "tile_template_e.png", "tile_template_i.png", "tile_template_m.png",
+                                "tile_template_n.png", "tile_template_r.png", "tile_template_s.png", "tile_template_u.png",
+                                "tile_template_v.png", "tile_template_w.png", "tile_template_x.png", "tile_template_z.png"]
+        rotation = [cv2.ROTATE_90_CLOCKWISE, cv2.ROTATE_180, cv2.ROTATE_90_COUNTERCLOCKWISE]
         textured_combination = textured_walls
         background = textured_walls
-        rotation = [cv2.ROTATE_90_CLOCKWISE, cv2.ROTATE_180, cv2.ROTATE_90_COUNTERCLOCKWISE]
+        for template in floor_tile_templates:
+            print ("Searching for " + template)
+            tile_template = cv2.imread("../Templates/" + template, 0)
+            loc = match(tile_template, original_bw)
+            for pt in zip(*loc[::-1]):
+                foreground = cv2.imread('../Textures/Brown_Tiles/tile' + str(random.randint(1, 34)) + '.png', -1)
+                degrees = random.randint(0, 3)
+                if (degrees != 3):
+                    foreground = cv2.rotate(foreground, rotation[degrees])
+                foreground = cv2.resize(foreground, (int(51), int(51)))
+                paste(pt[0], pt[1])
 
-        loc = match(tile_template, original_bw)
-        for pt in zip(*loc[::-1]):
-            foreground = cv2.imread('../Textures/White_Tiles/tile' + str(random.randint(1, 34)) + '.png', -1)
-            degrees = random.randint(0, 3)
-            if (degrees != 3):
-                foreground = cv2.rotate(foreground, rotation[degrees])
-            foreground = cv2.resize(foreground, (int(51), int(51)))
-            paste(pt[0], pt[1])
+        #loc = match(tile_template, original_bw)
 
     # Texture special tiles
     # ------------------------------------------------------------------------------
@@ -173,7 +182,7 @@ def texture(texture_path, tiling):
 
     # Final image
     cv2.imwrite('../Texturing/textured_dungeon.png', background)
-    print ("Finished!")
+    print ("Writing Final Image (this may take a minute)")
 
 if __name__ == "texture":
     texture()
