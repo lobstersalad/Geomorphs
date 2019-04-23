@@ -32,6 +32,9 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 from PIL import Image
+import os
+from os import listdir, walk
+from os.path import isfile, join
 
 def texture(texture_path, tiling):
     # Find array of x, y coordinates for given special tile type
@@ -69,15 +72,13 @@ def texture(texture_path, tiling):
     # ------------------------------------------------------------------------------
     original = cv2.imread(texture_path, -1)
     original_bw = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)
-    doorh_template = cv2.imread('../Templates/doorh_template.png', 0)
-    doorv_template = cv2.imread('../Templates/doorv_template.png', 0)
-    door_texture = cv2.imread('../Textures/Doors/door1.png', -1)
     wall_texture = cv2.imread('../Textures/Testing/tiles.png', -1)
-    floor_texture = cv2.imread('../Textures/Testing/grass.png', -1)
+    if tiling == False:
+        floor_texture = cv2.imread('../Textures/Testing/grass.png', -1)
 
     #  Dilate and draw contours
     # ------------------------------------------------------------------------------
-    print ("Drawing Walls...")
+    print ('Drawing Walls...')
     kernel = np.ones((5, 5), np.uint8)
     dilated = cv2.dilate(original, kernel, iterations = 2)
     dilated = cv2.cvtColor(dilated, cv2.COLOR_BGR2GRAY)
@@ -88,9 +89,9 @@ def texture(texture_path, tiling):
 
     # Texture walls
     # ------------------------------------------------------------------------------
-    print ("Texturing Walls...")
+    print ('Texturing Walls...')
     textured_walls = Image.fromarray(dilated)
-    textured_walls = textured_walls.convert("RGBA")
+    textured_walls = textured_walls.convert('RGBA')
     data = textured_walls.load()
 
     # Convert all pixels within contour lines to transparent
@@ -115,11 +116,11 @@ def texture(texture_path, tiling):
 
     # Texture floor
     # ------------------------------------------------------------------------------
-    print ("Texturing Floor...")
+    print ('Texturing Floor...')
     if tiling == False:
         textured_walls = cv2.cvtColor(textured_walls, cv2.COLOR_BGRA2RGBA)
         textured_combination = Image.fromarray(textured_walls)
-        textured_combination = textured_combination.convert("RGBA")
+        textured_combination = textured_combination.convert('RGBA')
         data = textured_combination.load()
 
         # Convert all non-transparent white pixels to transparent
@@ -142,21 +143,17 @@ def texture(texture_path, tiling):
         textured_combination_part = (textured_combination_img * (1 / 255.0)) * (textured_combination_mask * (1 / 255.0))
         textured_combination = np.uint8(cv2.addWeighted(floor_texture_part, 255.0, textured_combination_part, 255.0, 0.0))
     else:
-        floor_tile_templates = ["tile_template_plain.png", "tile_template_0.png", "tile_template_1.png", "tile_template_2.png",
-                                "tile_template_3.png", "tile_template_4.png", "tile_template_5.png", "tile_template_6.png",
-                                "tile_template_7.png", "tile_template_8.png", "tile_template_9.png", "tile_template_a.png",
-                                "tile_template_c.png", "tile_template_e.png", "tile_template_i.png", "tile_template_m.png",
-                                "tile_template_n.png", "tile_template_r.png", "tile_template_s.png", "tile_template_u.png",
-                                "tile_template_v.png", "tile_template_w.png", "tile_template_x.png", "tile_template_z.png"]
+        path = '../Templates/'
+        floor_tile_templates = [file for file in listdir(path) if isfile(join(path, file))]
         rotation = [cv2.ROTATE_90_CLOCKWISE, cv2.ROTATE_180, cv2.ROTATE_90_COUNTERCLOCKWISE]
         textured_combination = textured_walls
         background = textured_walls
+        tile_count = len(next(os.walk('../Textures/Brown_Tiles/')))
         for template in floor_tile_templates:
-            print ("Searching for " + template)
-            tile_template = cv2.imread("../Templates/" + template, 0)
+            tile_template = cv2.imread('../Templates/' + template, 0)
             loc = match(tile_template, original_bw)
             for pt in zip(*loc[::-1]):
-                foreground = cv2.imread('../Textures/Brown_Tiles/tile' + str(random.randint(1, 34)) + '.png', -1)
+                foreground = cv2.imread('../Textures/Brown_Tiles/tile' + str(random.randint(1, tile_count)) + '.png', -1)
                 degrees = random.randint(0, 3)
                 if (degrees != 3):
                     foreground = cv2.rotate(foreground, rotation[degrees])
@@ -165,24 +162,29 @@ def texture(texture_path, tiling):
 
         #loc = match(tile_template, original_bw)
 
-    # Texture special tiles
+    # Texture Special Tiles
+    # Doors
     # ------------------------------------------------------------------------------
-    print ("Texturing Special Tiles...")
-    foreground, background = door_texture, textured_combination
-    foreground = cv2.cvtColor(foreground, cv2.COLOR_BGRA2BGR)
-    foreground = cv2.resize(foreground, (int(51), int(51)))
+    print ('Texturing Special Tiles...')
+    background = textured_combination
+    #foreground = cv2.resize(foreground, (int(51), int(51)))
 
+    doorh_template = cv2.imread('../Templates/doorh_template.png', 0)
     loc = match(doorh_template, original_bw)
+    foreground = cv2.imread('../Textures/Doors/doorh_small.png', -1)
+    foreground = cv2.cvtColor(foreground, cv2.COLOR_BGRA2BGR)
     for pt in zip(*loc[::-1]):
-        paste(pt[0], pt[1])
+        paste(pt[0], pt[1] + 18)
 
+    doorv_template = cv2.imread('../Templates/doorv_template.png', 0)
     loc = match(doorv_template, original_bw)
+    foreground = cv2.imread('../Textures/Doors/doorv_small.png', -1)
+    foreground = cv2.cvtColor(foreground, cv2.COLOR_BGRA2BGR)
     for pt in zip(*loc[::-1]):
-        paste(pt[0], pt[1])
+        paste(pt[0] + 18, pt[1])
 
     # Final image
     cv2.imwrite('../Texturing/textured_dungeon.png', background)
-    print ("Writing Final Image (this may take a minute)")
 
-if __name__ == "texture":
+if __name__ == 'texture':
     texture()

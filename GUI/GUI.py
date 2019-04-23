@@ -163,6 +163,8 @@ class MainWindow(QMainWindow):
             texture(self.texture_path.text(), True)
         else:
             texture(self.texture_path.text(), False)
+        print ("Done!")
+
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
