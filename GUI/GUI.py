@@ -28,115 +28,152 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(window)
         grid = QGridLayout(window)
 
-        dungeon_name_label = QLabel("Dungeon Name")
+        dungeon_name_label = QLabel('Dungeon Name')
         self.dungeon_name_box = QtWidgets.QLineEdit()
         grid.addWidget(dungeon_name_label, 0, 0)
         grid.addWidget(self.dungeon_name_box, 0, 1)
 
-        random_seed_label = QLabel("Random Seed")
+        random_seed_label = QLabel('Random Seed')
         self.random_seed_box = QtWidgets.QLineEdit()
         grid.addWidget(random_seed_label, 1, 0)
         grid.addWidget(self.random_seed_box, 1, 1)
 
-        dungeon_layout_label = QLabel("Dungeon Layout")
+        dungeon_layout_label = QLabel('Dungeon Layout')
         self.dungeon_layout_dd = QtWidgets.QComboBox()
-        options = ["Square", "Rectangle", "Box", "Cross", "Dagger",
-                   "Saltire", "Keep", "Hexagon", "Round", "Cavernous"]
+        options = ['Square', 'Rectangle', 'Box', 'Cross', 'Dagger',
+                   'Saltire', 'Keep', 'Hexagon', 'Round', 'Cavernous']
         self.dungeon_layout_dd.addItems(options)
         grid.addWidget(dungeon_layout_label, 2, 0)
         grid.addWidget(self.dungeon_layout_dd, 2, 1)
+        self.dungeon_layout_dd.currentTextChanged.connect(self.updateLayout)
 
-        dungeon_size_label = QLabel("Dungeon Size")
+        dungeon_size_label = QLabel('Dungeon Size')
         self.dungeon_size_dd = QtWidgets.QComboBox()
-        options = ["Fine", "Diminiutive", "Tiny", "Small", "Medium", "Large",
-                   "Huge", "Gargantuan", "Colossal"]
-        # dungeon_size_dd.addItem("Custom") would need to open new dimension text boxes
+        options = ['Fine', 'Diminiutive', 'Tiny', 'Small', 'Medium', 'Large',
+                   'Huge', 'Gargantuan', 'Colossal']
+        # dungeon_size_dd.addItem('Custom') would need to open new dimension text boxes
         self.dungeon_size_dd.addItems(options)
         grid.addWidget(dungeon_size_label, 3, 0)
         grid.addWidget(self.dungeon_size_dd, 3, 1)
 
-        peripheral_egress_label = QLabel("Peripheral Egress")
+        peripheral_egress_label = QLabel('Peripheral Egress')
         self.peripheral_egress_dd = QtWidgets.QComboBox()
-        options = ["No", "Yes", "Tiling"]
+        options = ['No', 'Yes', 'Tiling']
         self.peripheral_egress_dd.addItems(options)
         grid.addWidget(peripheral_egress_label, 4, 0)
         grid.addWidget(self.peripheral_egress_dd, 4, 1)
 
-        add_stairs_label = QLabel("Stairs")
+        add_stairs_label = QLabel('Stairs')
         self.add_stairs_dd = QtWidgets.QComboBox()
-        options = ["No", "Yes", "Many"]
+        options = ['No', 'Yes', 'Many']
         self.add_stairs_dd.addItems(options)
         grid.addWidget(add_stairs_label, 5, 0)
         grid.addWidget(self.add_stairs_dd, 5, 1)
 
-        room_layout_label = QLabel("Room Layout")
+
+        room_layout_label = QLabel('Room Layout')
         self.room_layout_dd = QtWidgets.QComboBox()
-        options = ["Sparse", "Scattered", "Dense", "Symmetric", "Complex"]
+        options = ['Sparse', 'Scattered', 'Dense', 'Symmetric', 'Complex']
         self.room_layout_dd.addItems(options)
         grid.addWidget(room_layout_label, 6, 0)
         grid.addWidget(self.room_layout_dd, 6, 1)
 
-        room_size_label = QLabel("Room Size")
+
+        room_size_label = QLabel('Room Size')
         self.room_size_dd = QtWidgets.QComboBox()
-        options = ["Small", "Medium", "Large", "Huge", "Gargantuan", "Colossal"]
+        options = ['Small', 'Medium', 'Large', 'Huge', 'Gargantuan', 'Colossal']
         self.room_size_dd.addItems(options)
         grid.addWidget(room_size_label, 7, 0)
         grid.addWidget(self.room_size_dd, 7, 1)
 
-        door_set_label = QLabel("Doors")
+        door_set_label = QLabel('Doors')
         self.door_set_dd = QtWidgets.QComboBox()
-        options = ["None", "Basic", "Secure", "Standard", "Deathtrap"]
+        options = ['None', 'Basic', 'Secure', 'Standard', 'Deathtrap']
         self.door_set_dd.addItems(options)
         grid.addWidget(door_set_label, 8, 0)
         grid.addWidget(self.door_set_dd, 8, 1)
 
-        corridor_layout_label = QLabel("Corridors")
+        corridor_layout_label = QLabel('Corridors')
         self.corridor_layout_dd = QtWidgets.QComboBox()
-        options = ["Labyrinth", "Errant", "Straight"]
+        options = ['Labyrinth', 'Errant', 'Straight']
         self.corridor_layout_dd.addItems(options)
         grid.addWidget(corridor_layout_label, 9, 0)
         grid.addWidget(self.corridor_layout_dd, 9, 1)
 
-        remove_deadends_label = QLabel("Remove Deadends")
+        remove_deadends_label = QLabel('Remove Deadends')
         self.remove_deadends_dd = QtWidgets.QComboBox()
-        options = ["None", "Some", "All"]
+        options = ['None', 'Some', 'All']
         self.remove_deadends_dd.addItems(options)
         grid.addWidget(remove_deadends_label, 10, 0)
         grid.addWidget(self.remove_deadends_dd, 10, 1)
 
-        tiled_floors_label = QLabel("Tiled Floors")
+        tiled_floors_label = QLabel('Tiled Floors')
         self.tiled_floors_dd = QtWidgets.QComboBox()
-        options = ["Yes", "No"]
+        options = ['Yes', 'No']
         self.tiled_floors_dd.addItems(options)
         grid.addWidget(tiled_floors_label, 11, 0)
         grid.addWidget(self.tiled_floors_dd,  11, 1)
+        self.tiled_floors_dd.currentTextChanged.connect(self.updateFloorType)
 
-        download_label = QLabel("Download Path")
+        floor_type_label = QLabel('Floor Type')
+        self.floor_type_dd = QtWidgets.QComboBox()
+        options = ['Brown', 'Cave', 'Runes', 'White']
+        self.floor_type_dd.addItems(options)
+        grid.addWidget(floor_type_label, 12, 0)
+        grid.addWidget(self.floor_type_dd, 12, 1)
+
+        download_label = QLabel('Download Path')
         self.download_path = QLineEdit()
-        download_browse_button = QPushButton("Browse")
+        download_browse_button = QPushButton('Browse')
         download_browse_button.clicked.connect(self.set_download_path)
-        download_button = QPushButton("Download")
+        download_button = QPushButton('Download')
         download_button.clicked.connect(self.download_button_action)
-        grid.addWidget(download_label, 12, 0)
-        grid.addWidget(self.download_path, 12, 1)
-        grid.addWidget(download_browse_button, 12, 2)
-        grid.addWidget(download_button, 12, 3)
+        grid.addWidget(download_label, 14, 0)
+        grid.addWidget(self.download_path, 14, 1)
+        grid.addWidget(download_browse_button, 14, 2)
+        grid.addWidget(download_button, 14, 3)
 
-        texture_label = QLabel("Texture Path")
+        texture_label = QLabel('Texture Path')
         self.texture_path = QLineEdit()
-        texture_browse_button = QPushButton("Browse")
+        texture_browse_button = QPushButton('Browse')
         texture_browse_button.clicked.connect(self.set_texture_path)
-        texture_button = QPushButton("Texture")
+        texture_button = QPushButton('Texture')
         texture_button.clicked.connect(self.texture_button_action)
-        grid.addWidget(texture_label, 13, 0)
-        grid.addWidget(self.texture_path, 13, 1)
-        grid.addWidget(texture_browse_button, 13, 2)
-        grid.addWidget(texture_button, 13, 3)
+        grid.addWidget(texture_label, 15, 0)
+        grid.addWidget(self.texture_path, 15, 1)
+        grid.addWidget(texture_browse_button, 15, 2)
+        grid.addWidget(texture_button, 15, 3)
+
+    def updateLayout(self):
+        if self.dungeon_layout_dd.currentText() == 'Cavernous':
+            self.add_stairs_dd.setEnabled(False)
+            self.room_layout_dd.setEnabled(False)
+            self.room_size_dd.setEnabled(False)
+            self.door_set_dd.setEnabled(False)
+            self.corridor_layout_dd.setEnabled(False)
+            self.remove_deadends_dd.setEnabled(False)
+        else:
+            self.add_stairs_dd.setEnabled(True)
+            self.room_layout_dd.setEnabled(True)
+            self.room_size_dd.setEnabled(True)
+            self.door_set_dd.setEnabled(True)
+            self.corridor_layout_dd.setEnabled(True)
+            self.remove_deadends_dd.setEnabled(True)
+
+    def updateFloorType(self):
+        if self.tiled_floors_dd.currentText() == 'Yes':
+            self.floor_type_dd.clear()
+            options = ['Brown', 'Cave', 'Runes', 'White']
+            self.floor_type_dd.addItems(options)
+        if self.tiled_floors_dd.currentText() == 'No':
+            self.floor_type_dd.clear()
+            options = ['Dirt', 'Sand', 'Stone', 'Grass']
+            self.floor_type_dd.addItems(options)
 
     def set_download_path(self):
         options = QFileDialog.DontUseNativeDialog
         options |= QFileDialog.ShowDirsOnly
-        path = QFileDialog.getExistingDirectory(self, "Download Path", "", options = options)
+        path = QFileDialog.getExistingDirectory(self, 'Download Path', '', options = options)
         self.download_path.setText(path)
 
     def download_button_action(self):
@@ -155,18 +192,18 @@ class MainWindow(QMainWindow):
 
     def set_texture_path(self):
         options = QFileDialog.DontUseNativeDialog
-        path, filter = QFileDialog.getOpenFileName(self, "Texture Path", "", "PNG (*.PNG *.png);; JPEG (*.JPEG *.jpeg *.JPG *.jpg)", options = options)
+        path, filter = QFileDialog.getOpenFileName(self, 'Texture Path', '', 'PNG (*.PNG *.png);; JPEG (*.JPEG *.jpeg *.JPG *.jpg)', options = options)
         self.texture_path.setText(path)
 
     def texture_button_action(self):
-        if self.tiled_floors_dd.currentText() == "Yes":
-            texture(self.texture_path.text(), True)
+        if self.tiled_floors_dd.currentText() == 'Yes':
+            texture(self.texture_path.text(), self.floor_type_dd.currentText(), True)
         else:
-            texture(self.texture_path.text(), False)
-        print ("Done!")
+            texture(self.texture_path.text(), self.floor_type_dd.currentText(), False)
+        print ('Done!')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     mainWin = MainWindow()
     mainWin.show()
