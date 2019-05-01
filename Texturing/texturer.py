@@ -36,7 +36,7 @@ import os
 from os import listdir, walk
 from os.path import isfile, join
 
-def texture(texture_path, tiling):
+def texture(texture_path, floor_type, tiling):
     # Find array of x, y coordinates for given special tile type
     def match(template, image):
         w, h = template.shape[::-1]
@@ -72,9 +72,12 @@ def texture(texture_path, tiling):
     # ------------------------------------------------------------------------------
     original = cv2.imread(texture_path, -1)
     original_bw = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)
-    wall_texture = cv2.imread('../Textures/Testing/tiles.png', -1)
+    wall_texture = cv2.imread('../Textures/Untiled/tiles.png', -1)
     if tiling == False:
-        floor_texture = cv2.imread('../Textures/Testing/grass.png', -1)
+        if floor_type == "Grass":
+            floor_texture = cv2.imread('../Textures/Untiled/grass.png', -1)
+        else:
+            floor_texture = cv2.imread('../Textures/Untiled/tiles.png', -1)
 
     #  Dilate and draw contours
     # ------------------------------------------------------------------------------
@@ -148,12 +151,21 @@ def texture(texture_path, tiling):
         rotation = [cv2.ROTATE_90_CLOCKWISE, cv2.ROTATE_180, cv2.ROTATE_90_COUNTERCLOCKWISE]
         textured_combination = textured_walls
         background = textured_walls
-        tile_count = len(next(os.walk('../Textures/Brown_Tiles/')))
+        if floor_type == "Brown":
+            tile_path = '../Textures/Brown_Tiles/'
+        elif floor_type == "Cave":
+            tile_path = '../Textures/Cave_Tiles/'
+        elif floor_type == "Runes":
+            tile_path = '../Textures/Runes_Tiles/'
+        elif floor_type == "White":
+            tile_path = '../Textures/White_Tiles/'
+        tile_count = len(next(os.walk(path)))
         for template in floor_tile_templates:
-            tile_template = cv2.imread('../Templates/' + template, 0)
+            tile_template = cv2.imread(path + template, 0)
             loc = match(tile_template, original_bw)
             for pt in zip(*loc[::-1]):
-                foreground = cv2.imread('../Textures/Brown_Tiles/tile' + str(random.randint(1, tile_count)) + '.png', -1)
+                foreground = cv2.imread(tile_path + 'tile' + str(random.randint(1, tile_count)) + '.png', -1)
+                foreground = cv2.cvtColor(foreground, cv2.COLOR_BGRA2BGR)
                 degrees = random.randint(0, 3)
                 if (degrees != 3):
                     foreground = cv2.rotate(foreground, rotation[degrees])
@@ -169,19 +181,26 @@ def texture(texture_path, tiling):
     background = textured_combination
     #foreground = cv2.resize(foreground, (int(51), int(51)))
 
-    doorh_template = cv2.imread('../Templates/doorh_template.png', 0)
-    loc = match(doorh_template, original_bw)
+    temp = cv2.imread('../Templates/doorh_template.png', 0)
+    loc = match(temp, original_bw)
     foreground = cv2.imread('../Textures/Doors/doorh_small.png', -1)
     foreground = cv2.cvtColor(foreground, cv2.COLOR_BGRA2BGR)
     for pt in zip(*loc[::-1]):
         paste(pt[0], pt[1] + 18)
 
-    doorv_template = cv2.imread('../Templates/doorv_template.png', 0)
-    loc = match(doorv_template, original_bw)
+    temp = cv2.imread('../Templates/doorv_template.png', 0)
+    loc = match(temp, original_bw)
     foreground = cv2.imread('../Textures/Doors/doorv_small.png', -1)
     foreground = cv2.cvtColor(foreground, cv2.COLOR_BGRA2BGR)
     for pt in zip(*loc[::-1]):
         paste(pt[0] + 18, pt[1])
+
+    temp = cv2.imread('../Templates/stairs_pointdown.png', 0)
+    loc = match(temp, original_bw)
+    foreground = cv2.imread('../Textures/Stairs/stairsv.png', -1)
+    foreground = cv2.cvtColor(foreground, cv2.COLOR_BGRA2BGR)
+    for pt in zip(*loc[::-1]):
+        paste(pt[0], pt[1])
 
     # Final image
     cv2.imwrite('../Texturing/textured_dungeon.png', background)
