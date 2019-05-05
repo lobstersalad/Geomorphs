@@ -14,19 +14,12 @@ Procedure
 
 '''
 ToDo
- - Count number of files in tile directories for RNG tiling
- - Add images for all door types and numbered tiles
  - Resize original image to very large before any processing happens
     - Need to resize template images and retune dilation for this to work
     - Might produce better quality map for tiled floors
  - Template matching for wall segments
 '''
 
-'''
-Bugs
- - ? Fixed - Some dungeon layouts with doors give a difference of array size / channel error, has been hard to reproduce
-             but has something to do with special tile locations
-'''
 import random
 import cv2
 import numpy as np
@@ -36,12 +29,12 @@ import os
 from os import listdir, walk
 from os.path import isfile, join
 
-def texture(texture_path, floor_type, tiling):
+def texture(final_path, texture_path, floor_type, tiling):
     # Find array of x, y coordinates for given special tile type
     def match(template, image):
         w, h = template.shape[::-1]
         res = cv2.matchTemplate(image, template, cv2.TM_CCOEFF_NORMED)
-        threshold = 0.95
+        threshold = 0.98
         loc = np.where( res >= threshold)
         return loc
 
@@ -146,7 +139,7 @@ def texture(texture_path, floor_type, tiling):
         textured_combination_part = (textured_combination_img * (1 / 255.0)) * (textured_combination_mask * (1 / 255.0))
         textured_combination = np.uint8(cv2.addWeighted(floor_texture_part, 255.0, textured_combination_part, 255.0, 0.0))
     else:
-        path = '../Templates/'
+        path = '../Templates/Tiles/'
         floor_tile_templates = [file for file in listdir(path) if isfile(join(path, file))]
         rotation = [cv2.ROTATE_90_CLOCKWISE, cv2.ROTATE_180, cv2.ROTATE_90_COUNTERCLOCKWISE]
         textured_combination = textured_walls
@@ -181,29 +174,90 @@ def texture(texture_path, floor_type, tiling):
     background = textured_combination
     #foreground = cv2.resize(foreground, (int(51), int(51)))
 
-    temp = cv2.imread('../Templates/doorh_template.png', 0)
+    path = '../Templates/Doors/Horizontal/'
+    horizontal_door_templates = [file for file in listdir(path) if isfile(join(path, file))]
+    for template in horizontal_door_templates:
+        door_template = cv2.imread(path + template, 0)
+        loc = match(door_template, original_bw)
+        foreground = cv2.imread('../Textures/Doors/doorh_small.png', -1)
+        foreground = cv2.cvtColor(foreground, cv2.COLOR_BGRA2BGR)
+        for pt in zip(*loc[::-1]):
+            paste(pt[0], pt[1] + 18)
+
+    path = '../Templates/Doors/Vertical/'
+    vertical_door_templates = [file for file in listdir(path) if isfile(join(path, file))]
+    for template in vertical_door_templates:
+        door_template = cv2.imread(path + template, 0)
+        loc = match(door_template, original_bw)
+        foreground = cv2.imread('../Textures/Doors/doorv_small.png', -1)
+        foreground = cv2.cvtColor(foreground, cv2.COLOR_BGRA2BGR)
+        for pt in zip(*loc[::-1]):
+            paste(pt[0] + 18, pt[1])
+
+    # Stairs
+    # ------------------------------------------------------------------------------
+    temp = cv2.imread('../Templates/Stairs/stairs_pointdown.png', 0)
     loc = match(temp, original_bw)
-    foreground = cv2.imread('../Textures/Doors/doorh_small.png', -1)
+    foreground = cv2.imread('../Textures/Stairs/stairsv.png', -1)
+    foreground = cv2.rotate(foreground, cv2.ROTATE_180)
     foreground = cv2.cvtColor(foreground, cv2.COLOR_BGRA2BGR)
     for pt in zip(*loc[::-1]):
-        paste(pt[0], pt[1] + 18)
+        paste(pt[0], pt[1])
 
-    temp = cv2.imread('../Templates/doorv_template.png', 0)
+    temp = cv2.imread('../Templates/Stairs/stairs_pointleft.png', 0)
     loc = match(temp, original_bw)
-    foreground = cv2.imread('../Textures/Doors/doorv_small.png', -1)
+    foreground = cv2.imread('../Textures/Stairs/stairsh.png', -1)
+    foreground = cv2.rotate(foreground, cv2.ROTATE_180)
     foreground = cv2.cvtColor(foreground, cv2.COLOR_BGRA2BGR)
     for pt in zip(*loc[::-1]):
-        paste(pt[0] + 18, pt[1])
+        paste(pt[0], pt[1])
 
-    temp = cv2.imread('../Templates/stairs_pointdown.png', 0)
+    temp = cv2.imread('../Templates/Stairs/stairs_pointright.png', 0)
+    loc = match(temp, original_bw)
+    foreground = cv2.imread('../Textures/Stairs/stairsh.png', -1)
+    foreground = cv2.cvtColor(foreground, cv2.COLOR_BGRA2BGR)
+    for pt in zip(*loc[::-1]):
+        paste(pt[0], pt[1])
+
+    temp = cv2.imread('../Templates/Stairs/stairs_pointup.png', 0)
     loc = match(temp, original_bw)
     foreground = cv2.imread('../Textures/Stairs/stairsv.png', -1)
     foreground = cv2.cvtColor(foreground, cv2.COLOR_BGRA2BGR)
     for pt in zip(*loc[::-1]):
         paste(pt[0], pt[1])
 
+    temp = cv2.imread('../Templates/Stairs/stairs_opendown.png', 0)
+    loc = match(temp, original_bw)
+    foreground = cv2.imread('../Textures/Stairs/stairsv.png', -1)
+    foreground = cv2.cvtColor(foreground, cv2.COLOR_BGRA2BGR)
+    for pt in zip(*loc[::-1]):
+        paste(pt[0], pt[1])
+
+    temp = cv2.imread('../Templates/Stairs/stairs_openleft.png', 0)
+    loc = match(temp, original_bw)
+    foreground = cv2.imread('../Textures/Stairs/stairsh.png', -1)
+    foreground = cv2.cvtColor(foreground, cv2.COLOR_BGRA2BGR)
+    for pt in zip(*loc[::-1]):
+        paste(pt[0], pt[1])
+
+    temp = cv2.imread('../Templates/Stairs/stairs_openright.png', 0)
+    loc = match(temp, original_bw)
+    foreground = cv2.imread('../Textures/Stairs/stairsh.png', -1)
+    foreground = cv2.rotate(foreground, cv2.ROTATE_180)
+    foreground = cv2.cvtColor(foreground, cv2.COLOR_BGRA2BGR)
+    for pt in zip(*loc[::-1]):
+        paste(pt[0], pt[1])
+
+    temp = cv2.imread('../Templates/Stairs/stairs_openup.png', 0)
+    loc = match(temp, original_bw)
+    foreground = cv2.imread('../Textures/Stairs/stairsv.png', -1)
+    foreground = cv2.rotate(foreground, cv2.ROTATE_180)
+    foreground = cv2.cvtColor(foreground, cv2.COLOR_BGRA2BGR)
+    for pt in zip(*loc[::-1]):
+        paste(pt[0], pt[1])
+
     # Final image
-    cv2.imwrite('../Texturing/textured_dungeon.png', background)
+    cv2.imwrite(final_path, background)
 
 if __name__ == 'texture':
     texture()

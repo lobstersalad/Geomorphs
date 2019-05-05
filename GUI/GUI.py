@@ -125,9 +125,9 @@ class MainWindow(QMainWindow):
         download_label = QLabel('Download Path')
         self.download_path = QLineEdit()
         download_browse_button = QPushButton('Browse')
-        download_browse_button.clicked.connect(self.set_download_path)
+        download_browse_button.clicked.connect(self.setDownloadPath)
         download_button = QPushButton('Download')
-        download_button.clicked.connect(self.download_button_action)
+        download_button.clicked.connect(self.downloadButtonAction)
         grid.addWidget(download_label, 14, 0)
         grid.addWidget(self.download_path, 14, 1)
         grid.addWidget(download_browse_button, 14, 2)
@@ -136,9 +136,9 @@ class MainWindow(QMainWindow):
         texture_label = QLabel('Texture Path')
         self.texture_path = QLineEdit()
         texture_browse_button = QPushButton('Browse')
-        texture_browse_button.clicked.connect(self.set_texture_path)
+        texture_browse_button.clicked.connect(self.setTexturePath)
         texture_button = QPushButton('Texture')
-        texture_button.clicked.connect(self.texture_button_action)
+        texture_button.clicked.connect(self.textureButtonAction)
         grid.addWidget(texture_label, 15, 0)
         grid.addWidget(self.texture_path, 15, 1)
         grid.addWidget(texture_browse_button, 15, 2)
@@ -170,13 +170,13 @@ class MainWindow(QMainWindow):
             options = ['Dirt', 'Sand', 'Stone', 'Grass']
             self.floor_type_dd.addItems(options)
 
-    def set_download_path(self):
+    def setDownloadPath(self):
         options = QFileDialog.DontUseNativeDialog
         options |= QFileDialog.ShowDirsOnly
         path = QFileDialog.getExistingDirectory(self, 'Download Path', '', options = options)
         self.download_path.setText(path)
 
-    def download_button_action(self):
+    def downloadButtonAction(self):
         download(self.download_path.text(),
                  self.dungeon_name_box.text(),
                  self.random_seed_box.text(),
@@ -190,16 +190,20 @@ class MainWindow(QMainWindow):
                  self.corridor_layout_dd.currentText(),
                  self.remove_deadends_dd.currentText())
 
-    def set_texture_path(self):
+    def setTexturePath(self):
         options = QFileDialog.DontUseNativeDialog
         path, filter = QFileDialog.getOpenFileName(self, 'Texture Path', '', 'PNG (*.PNG *.png);; JPEG (*.JPEG *.jpeg *.JPG *.jpg)', options = options)
+        print (path)
         self.texture_path.setText(path)
 
-    def texture_button_action(self):
+    def textureButtonAction(self):
+        options = QFileDialog.DontUseNativeDialog
+        path, filter = QFileDialog.getSaveFileName(self, 'Save Image', '', 'PNG (*.PNG *.png);; JPEG (*.JPEG *.jpeg *.JPG *.jpg)', options = options)
+        print (path)
         if self.tiled_floors_dd.currentText() == 'Yes':
-            texture(self.texture_path.text(), self.floor_type_dd.currentText(), True)
+            texture(path, self.texture_path.text(), self.floor_type_dd.currentText(), True)
         else:
-            texture(self.texture_path.text(), self.floor_type_dd.currentText(), False)
+            texture(path, self.texture_path.text(), self.floor_type_dd.currentText(), False)
         print ('Done!')
 
 
