@@ -122,6 +122,13 @@ class MainWindow(QMainWindow):
         grid.addWidget(floor_type_label, 12, 0)
         grid.addWidget(self.floor_type_dd, 12, 1)
 
+        wall_type_label = QLabel('Wall Type')
+        self.wall_type_dd = QtWidgets.QComboBox()
+        options = ['Stone', 'Gold', 'Black', 'Ice']
+        self.wall_type_dd.addItems(options)
+        grid.addWidget(wall_type_label, 13, 0)
+        grid.addWidget(self.wall_type_dd, 13, 1)
+
         download_label = QLabel('Download Path')
         self.download_path = QLineEdit()
         download_browse_button = QPushButton('Browse')
@@ -167,7 +174,7 @@ class MainWindow(QMainWindow):
             self.floor_type_dd.addItems(options)
         if self.tiled_floors_dd.currentText() == 'No':
             self.floor_type_dd.clear()
-            options = ['Dirt', 'Sand', 'Stone', 'Grass']
+            options = ['Grass', 'Sand', 'Rocks', 'Snow']
             self.floor_type_dd.addItems(options)
 
     def setDownloadPath(self):
@@ -201,9 +208,9 @@ class MainWindow(QMainWindow):
         path, filter = QFileDialog.getSaveFileName(self, 'Save Image', '', 'PNG (*.PNG *.png);; JPEG (*.JPEG *.jpeg *.JPG *.jpg)', options = options)
         print (path)
         if self.tiled_floors_dd.currentText() == 'Yes':
-            texture(path, self.texture_path.text(), self.floor_type_dd.currentText(), True)
+            texture(path, self.texture_path.text(), self.floor_type_dd.currentText(), self.wall_type_dd.currentText(), True)
         else:
-            texture(path, self.texture_path.text(), self.floor_type_dd.currentText(), False)
+            texture(path, self.texture_path.text(), self.floor_type_dd.currentText(), self.wall_type_dd.currentText(), False)
         print ('Done!')
 
 

@@ -29,7 +29,7 @@ import os
 from os import listdir, walk
 from os.path import isfile, join
 
-def texture(final_path, texture_path, floor_type, tiling):
+def texture(final_path, texture_path, floor_type, wall_type, tiling):
     # Find array of x, y coordinates for given special tile type
     def match(template, image):
         w, h = template.shape[::-1]
@@ -65,12 +65,27 @@ def texture(final_path, texture_path, floor_type, tiling):
     # ------------------------------------------------------------------------------
     original = cv2.imread(texture_path, -1)
     original_bw = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)
-    wall_texture = cv2.imread('../Textures/Untiled/tiles.png', -1)
     if tiling == False:
-        if floor_type == "Grass":
+        if floor_type == 'Grass':
             floor_texture = cv2.imread('../Textures/Untiled/grass.png', -1)
+        elif floor_type == 'Sand':
+            floor_texture = cv2.imread('../Textures/Untiled/sand.png', -1)
+        elif floor_type == 'Rocks':
+            floor_texture = cv2.imread('../Textures/Untiled/rocks.png', -1)
+        elif floor_type == 'Snow':
+            floor_texture = cv2.imread('../Textures/Untiled/snow.png', -1)
         else:
             floor_texture = cv2.imread('../Textures/Untiled/tiles.png', -1)
+    if wall_type == 'Stone':
+        wall_texture = cv2.imread('../Textures/Untiled/tiles.png', -1)
+    elif wall_type == 'Gold':
+        wall_texture = cv2.imread('../Textures/Untiled/gold.png', -1)
+    elif wall_type == 'Black':
+        wall_texture = cv2.imread('../Textures/Untiled/black.png', -1)
+    elif wall_type == 'Ice':
+        wall_texture = cv2.imread('../Textures/Untiled/ice.png', -1)
+    else:
+        wall_texture = cv2.imread('../Textures/Untiled/grass.png', -1)
 
     #  Dilate and draw contours
     # ------------------------------------------------------------------------------
@@ -144,13 +159,13 @@ def texture(final_path, texture_path, floor_type, tiling):
         rotation = [cv2.ROTATE_90_CLOCKWISE, cv2.ROTATE_180, cv2.ROTATE_90_COUNTERCLOCKWISE]
         textured_combination = textured_walls
         background = textured_walls
-        if floor_type == "Brown":
+        if floor_type == 'Brown':
             tile_path = '../Textures/Brown_Tiles/'
-        elif floor_type == "Cave":
+        elif floor_type == 'Cave':
             tile_path = '../Textures/Cave_Tiles/'
-        elif floor_type == "Runes":
+        elif floor_type == 'Runes':
             tile_path = '../Textures/Runes_Tiles/'
-        elif floor_type == "White":
+        elif floor_type == 'White':
             tile_path = '../Textures/White_Tiles/'
         tile_count = len(next(os.walk(path)))
         for template in floor_tile_templates:
